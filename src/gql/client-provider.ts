@@ -1,6 +1,6 @@
 import { ApolloClient, from, HttpLink } from '@apollo/client';
-import { cache } from 'gql/cache';
-import { authLink } from 'gql/auth-link';
+import { cache } from './cache';
+import { authLink } from './auth-link';
 import { errorLink } from './error-link';
 
 const defaultOptions = {
