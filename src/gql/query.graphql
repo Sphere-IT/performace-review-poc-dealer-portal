@@ -164,6 +164,13 @@ query getAssignment($input: Float!) {
         submission{
           idDealerSubmission
           refIdAnswer
+
+          userProof{
+            idUserProof
+            fileKey
+            updatedDate
+            createdDate
+          }
         }
         refIdForm
         answers {
@@ -192,5 +199,26 @@ query getDealerUploadUrl {
   getDealerUploadUrl{
     fileName
     signedUrl
+  }
+}
+
+
+mutation saveUserProofFile($fileKey: String!, $submissionId: Float!){
+  saveUserProofFile(fileKey: $fileKey, submissionId: $submissionId){
+    idUserProof
+    refIdSubmission
+  }
+}
+
+mutation deleteUserProofFile($fileKey: String!){
+  deleteUserProofFile(fileKey: $fileKey){
+    message
+    success
+  }
+}
+
+mutation dealerFinalSubmission($input: Float!){
+  finalSubmission(assignmentId: $input){
+    idDealerSubmission
   }
 }

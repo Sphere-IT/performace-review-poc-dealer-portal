@@ -215,6 +215,7 @@ export type LoginAsDealerResponse = {
 export type Mutation = {
   __typename?: "Mutation";
   createDealerByAdmin: SuccessResponse;
+  deleteUserProofFile: SuccessResponse;
   evaluateAssignment: Scalars["Boolean"];
   finalSubmission: DealerSubmission;
   loginAsAdmin: LoginAsAdminResponse;
@@ -226,6 +227,10 @@ export type Mutation = {
 
 export type MutationCreateDealerByAdminArgs = {
   input: CreateDealerInput;
+};
+
+export type MutationDeleteUserProofFileArgs = {
+  fileKey: Scalars["String"];
 };
 
 export type MutationEvaluateAssignmentArgs = {
@@ -542,6 +547,13 @@ export type GetAssignmentQuery = {
           __typename?: "DealerSubmission";
           idDealerSubmission: string;
           refIdAnswer: number;
+          userProof?: Array<{
+            __typename?: "UserProof";
+            idUserProof: string;
+            fileKey: string;
+            updatedDate?: any | null;
+            createdDate?: any | null;
+          }> | null;
         } | null;
         answers?: Array<{
           __typename: "Answer";
@@ -578,6 +590,45 @@ export type GetDealerUploadUrlQuery = {
     __typename?: "S3SignedUrlResponse";
     fileName: string;
     signedUrl: string;
+  };
+};
+
+export type SaveUserProofFileMutationVariables = Exact<{
+  fileKey: Scalars["String"];
+  submissionId: Scalars["Float"];
+}>;
+
+export type SaveUserProofFileMutation = {
+  __typename?: "Mutation";
+  saveUserProofFile: {
+    __typename?: "UserProof";
+    idUserProof: string;
+    refIdSubmission: number;
+  };
+};
+
+export type DeleteUserProofFileMutationVariables = Exact<{
+  fileKey: Scalars["String"];
+}>;
+
+export type DeleteUserProofFileMutation = {
+  __typename?: "Mutation";
+  deleteUserProofFile: {
+    __typename?: "SuccessResponse";
+    message?: string | null;
+    success: boolean;
+  };
+};
+
+export type DealerFinalSubmissionMutationVariables = Exact<{
+  input: Scalars["Float"];
+}>;
+
+export type DealerFinalSubmissionMutation = {
+  __typename?: "Mutation";
+  finalSubmission: {
+    __typename?: "DealerSubmission";
+    idDealerSubmission: string;
   };
 };
 
@@ -874,6 +925,12 @@ export const GetAssignmentDocument = gql`
           submission {
             idDealerSubmission
             refIdAnswer
+            userProof {
+              idUserProof
+              fileKey
+              updatedDate
+              createdDate
+            }
           }
           refIdForm
           answers {
@@ -1049,4 +1106,157 @@ export type GetDealerUploadUrlLazyQueryHookResult = ReturnType<
 export type GetDealerUploadUrlQueryResult = Apollo.QueryResult<
   GetDealerUploadUrlQuery,
   GetDealerUploadUrlQueryVariables
+>;
+export const SaveUserProofFileDocument = gql`
+  mutation saveUserProofFile($fileKey: String!, $submissionId: Float!) {
+    saveUserProofFile(fileKey: $fileKey, submissionId: $submissionId) {
+      idUserProof
+      refIdSubmission
+    }
+  }
+`;
+export type SaveUserProofFileMutationFn = Apollo.MutationFunction<
+  SaveUserProofFileMutation,
+  SaveUserProofFileMutationVariables
+>;
+
+/**
+ * __useSaveUserProofFileMutation__
+ *
+ * To run a mutation, you first call `useSaveUserProofFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveUserProofFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveUserProofFileMutation, { data, loading, error }] = useSaveUserProofFileMutation({
+ *   variables: {
+ *      fileKey: // value for 'fileKey'
+ *      submissionId: // value for 'submissionId'
+ *   },
+ * });
+ */
+export function useSaveUserProofFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SaveUserProofFileMutation,
+    SaveUserProofFileMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    SaveUserProofFileMutation,
+    SaveUserProofFileMutationVariables
+  >(SaveUserProofFileDocument, options);
+}
+export type SaveUserProofFileMutationHookResult = ReturnType<
+  typeof useSaveUserProofFileMutation
+>;
+export type SaveUserProofFileMutationResult =
+  Apollo.MutationResult<SaveUserProofFileMutation>;
+export type SaveUserProofFileMutationOptions = Apollo.BaseMutationOptions<
+  SaveUserProofFileMutation,
+  SaveUserProofFileMutationVariables
+>;
+export const DeleteUserProofFileDocument = gql`
+  mutation deleteUserProofFile($fileKey: String!) {
+    deleteUserProofFile(fileKey: $fileKey) {
+      message
+      success
+    }
+  }
+`;
+export type DeleteUserProofFileMutationFn = Apollo.MutationFunction<
+  DeleteUserProofFileMutation,
+  DeleteUserProofFileMutationVariables
+>;
+
+/**
+ * __useDeleteUserProofFileMutation__
+ *
+ * To run a mutation, you first call `useDeleteUserProofFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteUserProofFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteUserProofFileMutation, { data, loading, error }] = useDeleteUserProofFileMutation({
+ *   variables: {
+ *      fileKey: // value for 'fileKey'
+ *   },
+ * });
+ */
+export function useDeleteUserProofFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeleteUserProofFileMutation,
+    DeleteUserProofFileMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DeleteUserProofFileMutation,
+    DeleteUserProofFileMutationVariables
+  >(DeleteUserProofFileDocument, options);
+}
+export type DeleteUserProofFileMutationHookResult = ReturnType<
+  typeof useDeleteUserProofFileMutation
+>;
+export type DeleteUserProofFileMutationResult =
+  Apollo.MutationResult<DeleteUserProofFileMutation>;
+export type DeleteUserProofFileMutationOptions = Apollo.BaseMutationOptions<
+  DeleteUserProofFileMutation,
+  DeleteUserProofFileMutationVariables
+>;
+export const DealerFinalSubmissionDocument = gql`
+  mutation dealerFinalSubmission($input: Float!) {
+    finalSubmission(assignmentId: $input) {
+      idDealerSubmission
+    }
+  }
+`;
+export type DealerFinalSubmissionMutationFn = Apollo.MutationFunction<
+  DealerFinalSubmissionMutation,
+  DealerFinalSubmissionMutationVariables
+>;
+
+/**
+ * __useDealerFinalSubmissionMutation__
+ *
+ * To run a mutation, you first call `useDealerFinalSubmissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDealerFinalSubmissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [dealerFinalSubmissionMutation, { data, loading, error }] = useDealerFinalSubmissionMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useDealerFinalSubmissionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DealerFinalSubmissionMutation,
+    DealerFinalSubmissionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DealerFinalSubmissionMutation,
+    DealerFinalSubmissionMutationVariables
+  >(DealerFinalSubmissionDocument, options);
+}
+export type DealerFinalSubmissionMutationHookResult = ReturnType<
+  typeof useDealerFinalSubmissionMutation
+>;
+export type DealerFinalSubmissionMutationResult =
+  Apollo.MutationResult<DealerFinalSubmissionMutation>;
+export type DealerFinalSubmissionMutationOptions = Apollo.BaseMutationOptions<
+  DealerFinalSubmissionMutation,
+  DealerFinalSubmissionMutationVariables
 >;

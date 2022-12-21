@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Col, Divider, Input, Row, Select, Typography, Upload } from "antd";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../../utils/context";
-import { Assignment, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
+import { Assignment, useDealerFinalSubmissionMutation, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
 import UploadComponent from "../../components/UploadComponent";
 
 
@@ -12,6 +12,7 @@ const FormSubmission = (props: any) => {
 
     const params = useParams();
     const authCtx = useAuthContext();
+    const navigate = useNavigate();
 
     const [getData, { loading }] = useGetAssignmentLazyQuery({
         fetchPolicy: "no-cache",
@@ -35,6 +36,20 @@ const FormSubmission = (props: any) => {
             }
         }
     });
+
+    const [submitForm, { loading: finalSubLoading }] = useDealerFinalSubmissionMutation({
+        context: {
+            headers: {
+                Authorization: `Bearer ${authCtx.token}`
+            }
+        },
+        onCompleted: (d) => {
+            navigate("/");
+        },
+        variables: {
+            input: +data?.idAssignment!
+        }
+    })
 
     const [saveAnswer, { loading: SaveProcessing }] = useSaveAssignmentAnswersMutation({
         fetchPolicy: "no-cache",
@@ -68,10 +83,36 @@ const FormSubmission = (props: any) => {
         })
     }
 
+    const cantSubmit = () => {
+        if (!data?.form?.questions?.length) return false;
+        for (let i = 0; i < data?.form?.questions?.length; i++) {
+            let item = data?.form?.questions[i];
+
+            if (item.submission) {
+                let needsProof = item.answers?.find((a2) => +a2?.idAnswer === item?.submission?.refIdAnswer)?.needsProof;
+                if (needsProof && !item.submission?.userProof?.length){
+                    return true;
+                }
+            }
+
+            if (!item?.submission){
+                return true;
+            }
+        }
+        return false;
+    }
+
     return (
         <Row style={{ width: "100%" }}>
             <Row style={{ width: "100%" }} justify="start" wrap>
-                <Col span={8}>sdf</Col>
+                <Col span={20}>
+                    <Typography.Title level={3}>{data?.form?.formTitle}</Typography.Title>
+                    <Typography.Text>{data?.assignmentStatus}</Typography.Text>
+                    <Typography.Paragraph>{data?.form?.formDescription}</Typography.Paragraph>
+                </Col>
+                <Col span={4} style={{ justifyContent: "center", alignItems: "center", display: "flex"}}>
+                    <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW"}>Submit</Button>
+                </Col>
             </Row>
             <Row style={{ width: "100%" }}>
                 {
@@ -86,6 +127,7 @@ const FormSubmission = (props: any) => {
                                     <Select
                                     // defaultValue="lucy"
                                     // {q}
+                                    disabled={data?.assignmentStatus === "PENDING_REVIEW"}
                                     style={{ width: "100%" }}
                                     placeholder={"Select Answer "}
                                     onChange={(e) => onAnswerChange({answer: e, question: q.idQuestion, assignment: data.idAssignment})}
@@ -103,7 +145,13 @@ const FormSubmission = (props: any) => {
 
                                     {
                                         q.answers?.find((a2) => +a2?.idAnswer === q?.submission?.refIdAnswer)?.needsProof ?
-                                            <UploadComponent answerId={q.submission?.refIdAnswer} /> :
+                                            <UploadComponent 
+                                                answerId={q.submission?.refIdAnswer} 
+                                                submission={q.submission} 
+                                                submissionId={q.submission?.idDealerSubmission}
+                                                onReload={getData}
+                                                disabled={data?.assignmentStatus === "PENDING_REVIEW"}
+                                                /> :
                                          null
                                     }
                                 </Card>
@@ -111,6 +159,9 @@ const FormSubmission = (props: any) => {
                         );
                     }) : null
                 }
+            </Row>
+            <Row>
+                
             </Row>
         </Row>
     );
