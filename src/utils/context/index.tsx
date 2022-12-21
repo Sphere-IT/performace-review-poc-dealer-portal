@@ -5,7 +5,7 @@ import { LOCAL_STORAGE_KEYS } from "../helpers/constants";
 
 const initialState = {
     isLoggedIn: storeService.get(LOCAL_STORAGE_KEYS.IS_LOGGED_IN) ?? false,
-    login: (input: any) => {},
+    login: (input: any, cb?: any) => {},
     logout: () => {},
     user: storeService.get(LOCAL_STORAGE_KEYS.USER),
     token: storeService.get(LOCAL_STORAGE_KEYS.TOKEN),

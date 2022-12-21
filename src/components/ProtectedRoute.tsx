@@ -5,16 +5,18 @@ import storeService from "../utils/helpers/store";
 import { LOCAL_STORAGE_KEYS } from "../utils/helpers/constants";
 
 const ProtectedRoute = (props: any) => {
-    const authCtx = useAuthContext();
-    const navigate = useNavigate();
+    const { user, isLoggedIn } = useAuthContext();
+    // const navigate = useNavigate();
     
 
-    useEffect(() => {
-        console.log(authCtx.isLoggedIn || storeService.get(LOCAL_STORAGE_KEYS.IS_LOGGED_IN))
-    }, []);
+    // useEffect(() => {
+    //     console.log(authCtx.isLoggedIn || storeService.get(LOCAL_STORAGE_KEYS.IS_LOGGED_IN))
+    // }, []);
+
+    // console.log(isLoggedIn, "from herere")
     
     return (
-        authCtx.isLoggedIn || storeService.get(LOCAL_STORAGE_KEYS.IS_LOGGED_IN) ? 
+        isLoggedIn ? 
         props.Element : 
         <Navigate to="/login" />
     );

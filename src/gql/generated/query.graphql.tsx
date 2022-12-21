@@ -67,6 +67,7 @@ export type Assignment = {
 };
 
 export type AssignmentSubmissionInput = {
+  fileKey?: InputMaybe<Array<Scalars["String"]>>;
   refIdAnswer: Scalars["Int"];
   refIdAssignment: Scalars["Int"];
   refIdQuestion: Scalars["Int"];
@@ -78,7 +79,6 @@ export type CountryToScoreRes = {
 };
 
 export type CreateDealerInput = {
-  accountManager?: InputMaybe<Scalars["String"]>;
   address1?: InputMaybe<Scalars["String"]>;
   address2?: InputMaybe<Scalars["String"]>;
   contactPersonEmail?: InputMaybe<Scalars["String"]>;
@@ -86,14 +86,12 @@ export type CreateDealerInput = {
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country: Scalars["String"];
   emailId: Scalars["String"];
-  idAssignment: Scalars["Float"];
   joinDate: Scalars["DateTime"];
   landLine?: InputMaybe<Scalars["String"]>;
   mediaUrl?: InputMaybe<Scalars["String"]>;
   mobile?: InputMaybe<Scalars["String"]>;
   name?: InputMaybe<Scalars["String"]>;
   pwd: Scalars["String"];
-  refIdForms: Array<Scalars["Float"]>;
   website?: InputMaybe<Scalars["String"]>;
 };
 
@@ -101,12 +99,14 @@ export type DealerSubmission = {
   __typename?: "DealerSubmission";
   createdDate?: Maybe<Scalars["DateTime"]>;
   idDealerSubmission: Scalars["ID"];
+  questionDetails: Question;
   refIdAnswer: Scalars["Int"];
   refIdAssignment: Scalars["Int"];
   refIdDealerUser: Scalars["String"];
   refIdQuestion: Scalars["Int"];
   submission_status: Submission_Status;
   updatedDate?: Maybe<Scalars["DateTime"]>;
+  userProof?: Maybe<Array<UserProof>>;
 };
 
 export type DealerUser = {
@@ -132,7 +132,6 @@ export type DealerUser = {
 };
 
 export type EditDealerInput = {
-  accountManager?: InputMaybe<Scalars["String"]>;
   address1?: InputMaybe<Scalars["String"]>;
   address2?: InputMaybe<Scalars["String"]>;
   contactPersonEmail?: InputMaybe<Scalars["String"]>;
@@ -140,7 +139,6 @@ export type EditDealerInput = {
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country?: InputMaybe<Scalars["String"]>;
   emailId?: InputMaybe<Scalars["String"]>;
-  idAssignment?: InputMaybe<Scalars["Float"]>;
   idDealerUser: Scalars["String"];
   joinDate?: InputMaybe<Scalars["DateTime"]>;
   landLine?: InputMaybe<Scalars["String"]>;
@@ -148,7 +146,6 @@ export type EditDealerInput = {
   mobile?: InputMaybe<Scalars["String"]>;
   name?: InputMaybe<Scalars["String"]>;
   pwd?: InputMaybe<Scalars["String"]>;
-  refIdForms?: InputMaybe<Array<Scalars["Float"]>>;
   website?: InputMaybe<Scalars["String"]>;
 };
 
@@ -185,9 +182,16 @@ export type Form = {
   updatedDate?: Maybe<Scalars["DateTime"]>;
 };
 
+export type GetDealerResponse = {
+  __typename?: "GetDealerResponse";
+  dealer: DealerUser;
+  score?: Maybe<Scalars["Float"]>;
+};
+
 export type ListDealerResponse = {
   __typename?: "ListDealerResponse";
   results: Array<DealerUser>;
+  scores?: Maybe<Scalars["Float"]>;
   totalRows?: Maybe<Scalars["Float"]>;
 };
 
@@ -210,12 +214,12 @@ export type LoginAsDealerResponse = {
 
 export type Mutation = {
   __typename?: "Mutation";
-  createDealerByAdmin: DealerUser;
+  createDealerByAdmin: SuccessResponse;
   evaluateAssignment: Scalars["Boolean"];
   finalSubmission: DealerSubmission;
   loginAsAdmin: LoginAsAdminResponse;
   loginAsDealer: LoginAsDealerResponse;
-  saveAssignmentAnswers: DealerSubmission;
+  saveAssignmentAnswers: SuccessResponse;
   saveUserProofFile: UserProof;
   updateDealerByAdmin: DealerUser;
 };
@@ -257,8 +261,9 @@ export type Query = {
   __typename?: "Query";
   exportDealerScores: ExportDealersScoresResponse;
   getAllDealers: ListDealerResponse;
+  getAssignment: Assignment;
   getCountryToScore: CountryToScoreRes;
-  getDealer: DealerUser;
+  getDealer: GetDealerResponse;
   getDealerUploadUrl: S3SignedUrlResponse;
   getSubmissionStatusCount: SubmissionStatusRes;
   getUserProofFile: UserProof;
@@ -273,6 +278,10 @@ export type QueryGetAllDealersArgs = {
   input: ListDealersInputs;
 };
 
+export type QueryGetAssignmentArgs = {
+  assignmetId: Scalars["Float"];
+};
+
 export type QueryGetUserProofFileArgs = {
   submissionId: Scalars["Float"];
 };
@@ -285,6 +294,7 @@ export type Question = {
   questionOrder: Scalars["Int"];
   questionText: Scalars["String"];
   refIdForm: Scalars["Int"];
+  submission?: Maybe<DealerSubmission>;
 };
 
 export type QuestionAnswerCountRes = {
@@ -305,9 +315,16 @@ export type SubmissionStatusRes = {
   rejected: Scalars["Int"];
 };
 
+export type SuccessResponse = {
+  __typename?: "SuccessResponse";
+  message?: Maybe<Scalars["String"]>;
+  success: Scalars["Boolean"];
+};
+
 export type UserProof = {
   __typename?: "UserProof";
   createdDate?: Maybe<Scalars["DateTime"]>;
+  dealerSubmissions: DealerSubmission;
   fileKey: Scalars["String"];
   idUserProof: Scalars["ID"];
   refIdSubmission: Scalars["Int"];
@@ -399,7 +416,6 @@ export type LoginAsDealerMutation = {
             idQuestion: string;
             questionOrder: number;
             questionText: string;
-            refIdForm: number;
           }> | null;
         };
       }> | null;
@@ -412,46 +428,156 @@ export type GetDealerQueryVariables = Exact<{ [key: string]: never }>;
 export type GetDealerQuery = {
   __typename?: "Query";
   getDealer: {
-    __typename?: "DealerUser";
-    address1?: string | null;
-    address2?: string | null;
-    contactPersonEmail?: string | null;
-    contactPersonName?: string | null;
-    contactPersonPhone?: string | null;
-    country: string;
-    createdDate?: any | null;
-    emailId: string;
-    idDealerUser: string;
-    joinDate: any;
-    landLine?: string | null;
-    mediaUrl?: string | null;
-    mobile?: string | null;
-    name: string;
-    updatedDate?: any | null;
-    website?: string | null;
-    assignment?: Array<{
-      __typename?: "Assignment";
-      assignmentStatus: Assignment_Status;
+    __typename?: "GetDealerResponse";
+    dealer: {
+      __typename?: "DealerUser";
+      address1?: string | null;
+      address2?: string | null;
+      contactPersonEmail?: string | null;
+      contactPersonName?: string | null;
+      contactPersonPhone?: string | null;
+      country: string;
       createdDate?: any | null;
-      idAssignment: string;
-      refIdDealerUser: string;
+      emailId: string;
+      idDealerUser: string;
+      joinDate: any;
+      landLine?: string | null;
+      mediaUrl?: string | null;
+      mobile?: string | null;
+      name: string;
       updatedDate?: any | null;
-      form: {
-        __typename?: "Form";
+      website?: string | null;
+      assignment?: Array<{
+        __typename?: "Assignment";
+        assignmentStatus: Assignment_Status;
         createdDate?: any | null;
-        formDescription?: string | null;
-        formTitle?: string | null;
-        idForm: string;
+        idAssignment: string;
+        refIdDealerUser: string;
         updatedDate?: any | null;
-        questions?: Array<{
-          __typename?: "Question";
-          idQuestion: string;
-          questionOrder: number;
-          questionText: string;
-          refIdForm: number;
+        form: {
+          __typename?: "Form";
+          createdDate?: any | null;
+          formDescription?: string | null;
+          formTitle?: string | null;
+          idForm: string;
+          isActive: boolean;
+          updatedDate?: any | null;
+          questions?: Array<{
+            __typename?: "Question";
+            idQuestion: string;
+            questionOrder: number;
+            questionText: string;
+            refIdForm: number;
+            form: {
+              __typename?: "Form";
+              createdDate?: any | null;
+              formDescription?: string | null;
+              formTitle?: string | null;
+              idForm: string;
+              isActive: boolean;
+              updatedDate?: any | null;
+              questions?: Array<{
+                __typename?: "Question";
+                idQuestion: string;
+                questionOrder: number;
+                questionText: string;
+                refIdForm: number;
+                answers?: Array<{
+                  __typename?: "Answer";
+                  answerText: string;
+                  createdDate?: any | null;
+                  idAnswer: string;
+                  needsProof: boolean;
+                  points: number;
+                  refIdForms: number;
+                  refIdQuestion: number;
+                  updatedDate?: any | null;
+                }> | null;
+              }> | null;
+            };
+            answers?: Array<{
+              __typename?: "Answer";
+              answerText: string;
+              createdDate?: any | null;
+              idAnswer: string;
+              needsProof: boolean;
+              points: number;
+              refIdForms: number;
+              refIdQuestion: number;
+              updatedDate?: any | null;
+            }> | null;
+          }> | null;
+        };
+      }> | null;
+    };
+  };
+};
+
+export type GetAssignmentQueryVariables = Exact<{
+  input: Scalars["Float"];
+}>;
+
+export type GetAssignmentQuery = {
+  __typename?: "Query";
+  getAssignment: {
+    __typename: "Assignment";
+    assignmentStatus: Assignment_Status;
+    idAssignment: string;
+    createdDate?: any | null;
+    updatedDate?: any | null;
+    refIdDealerUser: string;
+    form: {
+      __typename: "Form";
+      formTitle?: string | null;
+      formDescription?: string | null;
+      idForm: string;
+      isActive: boolean;
+      questions?: Array<{
+        __typename: "Question";
+        idQuestion: string;
+        questionOrder: number;
+        questionText: string;
+        refIdForm: number;
+        submission?: {
+          __typename?: "DealerSubmission";
+          idDealerSubmission: string;
+          refIdAnswer: number;
+        } | null;
+        answers?: Array<{
+          __typename: "Answer";
+          idAnswer: string;
+          answerText: string;
+          createdDate?: any | null;
+          updatedDate?: any | null;
+          points: number;
+          needsProof: boolean;
         }> | null;
-      };
-    }> | null;
+      }> | null;
+    };
+  };
+};
+
+export type SaveAssignmentAnswersMutationVariables = Exact<{
+  input: AssignmentSubmissionInput;
+}>;
+
+export type SaveAssignmentAnswersMutation = {
+  __typename?: "Mutation";
+  saveAssignmentAnswers: {
+    __typename?: "SuccessResponse";
+    success: boolean;
+    message?: string | null;
+  };
+};
+
+export type GetDealerUploadUrlQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetDealerUploadUrlQuery = {
+  __typename?: "Query";
+  getDealerUploadUrl: {
+    __typename?: "S3SignedUrlResponse";
+    fileName: string;
+    signedUrl: string;
   };
 };
 
@@ -533,7 +659,6 @@ export const LoginAsDealerDocument = gql`
               idQuestion
               questionOrder
               questionText
-              refIdForm
             }
             updatedDate
           }
@@ -605,42 +730,79 @@ export type LoginAsDealerMutationOptions = Apollo.BaseMutationOptions<
 export const GetDealerDocument = gql`
   query getDealer {
     getDealer {
-      address1
-      address2
-      assignment {
-        assignmentStatus
-        createdDate
-        form {
+      dealer {
+        address1
+        address2
+        assignment {
+          assignmentStatus
           createdDate
-          formDescription
-          formTitle
-          idForm
-          questions {
-            idQuestion
-            questionOrder
-            questionText
-            refIdForm
+          form {
+            createdDate
+            formDescription
+            formTitle
+            idForm
+            isActive
+            questions {
+              form {
+                createdDate
+                formDescription
+                formTitle
+                idForm
+                isActive
+                questions {
+                  answers {
+                    answerText
+                    createdDate
+                    idAnswer
+                    needsProof
+                    points
+                    refIdForms
+                    refIdQuestion
+                    updatedDate
+                  }
+                  idQuestion
+                  questionOrder
+                  questionText
+                  refIdForm
+                }
+                updatedDate
+              }
+              answers {
+                answerText
+                createdDate
+                idAnswer
+                needsProof
+                points
+                refIdForms
+                refIdQuestion
+                updatedDate
+              }
+              idQuestion
+              questionOrder
+              questionText
+              refIdForm
+            }
+            updatedDate
           }
+          idAssignment
+          refIdDealerUser
           updatedDate
         }
-        idAssignment
-        refIdDealerUser
+        contactPersonEmail
+        contactPersonName
+        contactPersonPhone
+        country
+        createdDate
+        emailId
+        idDealerUser
+        joinDate
+        landLine
+        mediaUrl
+        mobile
+        name
         updatedDate
+        website
       }
-      contactPersonEmail
-      contactPersonName
-      contactPersonPhone
-      country
-      createdDate
-      emailId
-      idDealerUser
-      joinDate
-      landLine
-      mediaUrl
-      mobile
-      name
-      updatedDate
-      website
     }
   }
 `;
@@ -688,4 +850,203 @@ export type GetDealerLazyQueryHookResult = ReturnType<
 export type GetDealerQueryResult = Apollo.QueryResult<
   GetDealerQuery,
   GetDealerQueryVariables
+>;
+export const GetAssignmentDocument = gql`
+  query getAssignment($input: Float!) {
+    getAssignment(assignmetId: $input) {
+      assignmentStatus
+      idAssignment
+      createdDate
+      updatedDate
+      refIdDealerUser
+      __typename
+      form {
+        __typename
+        formTitle
+        formDescription
+        idForm
+        isActive
+        questions {
+          __typename
+          idQuestion
+          questionOrder
+          questionText
+          submission {
+            idDealerSubmission
+            refIdAnswer
+          }
+          refIdForm
+          answers {
+            __typename
+            idAnswer
+            answerText
+            createdDate
+            updatedDate
+            points
+            needsProof
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useGetAssignmentQuery__
+ *
+ * To run a query within a React component, call `useGetAssignmentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAssignmentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAssignmentQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGetAssignmentQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetAssignmentQuery,
+    GetAssignmentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetAssignmentQuery, GetAssignmentQueryVariables>(
+    GetAssignmentDocument,
+    options
+  );
+}
+export function useGetAssignmentLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetAssignmentQuery,
+    GetAssignmentQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetAssignmentQuery, GetAssignmentQueryVariables>(
+    GetAssignmentDocument,
+    options
+  );
+}
+export type GetAssignmentQueryHookResult = ReturnType<
+  typeof useGetAssignmentQuery
+>;
+export type GetAssignmentLazyQueryHookResult = ReturnType<
+  typeof useGetAssignmentLazyQuery
+>;
+export type GetAssignmentQueryResult = Apollo.QueryResult<
+  GetAssignmentQuery,
+  GetAssignmentQueryVariables
+>;
+export const SaveAssignmentAnswersDocument = gql`
+  mutation saveAssignmentAnswers($input: AssignmentSubmissionInput!) {
+    saveAssignmentAnswers(input: $input) {
+      success
+      message
+    }
+  }
+`;
+export type SaveAssignmentAnswersMutationFn = Apollo.MutationFunction<
+  SaveAssignmentAnswersMutation,
+  SaveAssignmentAnswersMutationVariables
+>;
+
+/**
+ * __useSaveAssignmentAnswersMutation__
+ *
+ * To run a mutation, you first call `useSaveAssignmentAnswersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveAssignmentAnswersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveAssignmentAnswersMutation, { data, loading, error }] = useSaveAssignmentAnswersMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveAssignmentAnswersMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SaveAssignmentAnswersMutation,
+    SaveAssignmentAnswersMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    SaveAssignmentAnswersMutation,
+    SaveAssignmentAnswersMutationVariables
+  >(SaveAssignmentAnswersDocument, options);
+}
+export type SaveAssignmentAnswersMutationHookResult = ReturnType<
+  typeof useSaveAssignmentAnswersMutation
+>;
+export type SaveAssignmentAnswersMutationResult =
+  Apollo.MutationResult<SaveAssignmentAnswersMutation>;
+export type SaveAssignmentAnswersMutationOptions = Apollo.BaseMutationOptions<
+  SaveAssignmentAnswersMutation,
+  SaveAssignmentAnswersMutationVariables
+>;
+export const GetDealerUploadUrlDocument = gql`
+  query getDealerUploadUrl {
+    getDealerUploadUrl {
+      fileName
+      signedUrl
+    }
+  }
+`;
+
+/**
+ * __useGetDealerUploadUrlQuery__
+ *
+ * To run a query within a React component, call `useGetDealerUploadUrlQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetDealerUploadUrlQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetDealerUploadUrlQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetDealerUploadUrlQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    GetDealerUploadUrlQuery,
+    GetDealerUploadUrlQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    GetDealerUploadUrlQuery,
+    GetDealerUploadUrlQueryVariables
+  >(GetDealerUploadUrlDocument, options);
+}
+export function useGetDealerUploadUrlLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetDealerUploadUrlQuery,
+    GetDealerUploadUrlQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    GetDealerUploadUrlQuery,
+    GetDealerUploadUrlQueryVariables
+  >(GetDealerUploadUrlDocument, options);
+}
+export type GetDealerUploadUrlQueryHookResult = ReturnType<
+  typeof useGetDealerUploadUrlQuery
+>;
+export type GetDealerUploadUrlLazyQueryHookResult = ReturnType<
+  typeof useGetDealerUploadUrlLazyQuery
+>;
+export type GetDealerUploadUrlQueryResult = Apollo.QueryResult<
+  GetDealerUploadUrlQuery,
+  GetDealerUploadUrlQueryVariables
 >;

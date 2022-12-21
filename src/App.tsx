@@ -1,22 +1,12 @@
-import React, { useEffect } from 'react';
-import routes from './utils/routes';
-import { RouterProvider } from 'react-router-dom';
+import React from 'react';
+import Router from './utils/routes';
 import "./index.css";
-import { MainContext, useAuthContext } from './utils/context';
+import { MainContext } from './utils/context';
 // export default router;
 function App() {
 
-  const authCtx = useAuthContext();
-
-  useEffect(() => {
-    authCtx.checkLogin();
-    console.log("ddda", authCtx.user)
-  }, []);
-
   return (
-    <MainContext>
-      <RouterProvider router={routes} />
-    </MainContext>
+      <Router />
   );
 }
 

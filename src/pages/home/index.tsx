@@ -1,14 +1,14 @@
-import { Col, Result, Row } from "antd";
+import { Card, Col, Result, Row, Statistic } from "antd";
 import { useState } from "react";
-import { useGetDealerLazyQuery, useGetDealerQuery } from "../../gql/generated/query.graphql";
-import storeService from "../../utils/helpers/store";
-import { LOCAL_STORAGE_KEYS } from "../../utils/helpers/constants";
+import { Assignment, useGetDealerQuery } from "../../gql/generated/query.graphql";
 import { useAuthContext } from "../../utils/context";
+import { useNavigate } from "react-router-dom";
 
 const Home = (props: any) => {
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<Partial<Assignment>[]>([]);
 
     const authContext = useAuthContext();
+    const navigate = useNavigate();
 
     const { loading } = useGetDealerQuery({
         context: {
@@ -16,8 +16,12 @@ const Home = (props: any) => {
                 Authorization: `Bearer ${authContext.token}`
             }
         },
+        fetchPolicy: "no-cache",
         onCompleted: (d) => {
-            console.log(d);
+            const dd:any = d?.getDealer?.dealer?.assignment;
+            if (dd) {
+                setData(dd);
+            }
         },
         onError: (d) => {
             console.log(authContext.token);
@@ -26,7 +30,7 @@ const Home = (props: any) => {
     });
     
     return (
-        <Row style={{ width: "100%" }} justify={"center"} align={"middle"}>
+        <Row style={{ width: "100%" }} justify={"start"} align={"top"}>
             {
                 !data ?
                 <Col span={12} md={12} xs={12} lg={12}>
@@ -38,8 +42,29 @@ const Home = (props: any) => {
                 />
                 </Col> :
                 loading ?
-                null
-                : null
+                <Card>
+                    <Statistic 
+                        // title={i.form?.formTitle}
+                        // value={i.assignmentStatus}
+                        loading={true}
+                        style={{ minWidth: 100}}
+                    />
+                </Card>
+                :
+                data.map(i => {
+                    return (
+                        <Card 
+                            key={`key-card-item-page-listing-${i.idAssignment}`} 
+                            style={{ cursor: "pointer", marginRight: 15 }} 
+                            onClick={() => navigate(`form/${i.idAssignment}`)}>
+                            <Statistic 
+                                title={i.form?.formTitle}
+                                value={i.assignmentStatus}
+                                style={{ minWidth: 100 }}
+                            />
+                        </Card>
+                    );
+                })
             }
         </Row>
     );

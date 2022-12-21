@@ -1,121 +1,196 @@
-mutation loginAsAdmin(
-$input: loginAsAdminInput!
-){
-     loginAsAdmin(
-input: $input ){ accessToken
-adminUser{
-emailId
-firstName
-idAdminUser
-# isActive
-lastName
-# pwd
- createdDate
-updatedDate
-deletedAt
-} }
-}
-
-mutation loginAsDealer($input: LoginAsDealerInput!){
-    loginAsDealer(input: $input){
-        accessToken
-        dealerUser {
-            address1
-            address2
-            assignment{
-                assignmentStatus
-                createdDate
-                form {
-                    createdDate
-                    formDescription
-                    formTitle
-                    idForm
-                    # isActive
-                    questions {
-                        # answers: [Answer!]
-                        # form: Form!
-                        idQuestion
-                        questionOrder
-                        questionText
-                        refIdForm
-                    }
-                    updatedDate
-                }
-                idAssignment
-                refIdDealerUser
-                updatedDate
-            }
-            contactPersonEmail
-            contactPersonName
-            contactPersonPhone
-            country
-            createdDate
-            emailId
-            idDealerUser
-            joinDate
-            landLine
-            mediaUrl
-            mobile
-            name
-            # pwd
-            updatedDate
-            website
-        }
+mutation loginAsAdmin($input: loginAsAdminInput!) {
+  loginAsAdmin(input: $input) {
+    accessToken
+    adminUser {
+      emailId
+      firstName
+      idAdminUser
+      # isActive
+      lastName
+      # pwd
+      createdDate
+      updatedDate
+      deletedAt
     }
+  }
 }
 
-query getDealer{
-    getDealer{
-            address1
-            address2
-            assignment{
-                assignmentStatus
-                createdDate
-                form {
-                    createdDate
-                    formDescription
-                    formTitle
-                    idForm
-                    # isActive
-                    questions {
-                        # answers{
-                        #     answerText
-                        #     createdDate
-                        #     idAnswer
-                        #     needsProof
-                        #     points
-                        #     question
-                        #     refIdForms
-                        #     refIdQuestion
-                        #     updatedDate
-                        # }
-                        # form: Form!
-                        idQuestion
-                        questionOrder
-                        questionText
-                        refIdForm
-                    }
-                    updatedDate
-                }
-                idAssignment
-                refIdDealerUser
-                updatedDate
-            }
-            contactPersonEmail
-            contactPersonName
-            contactPersonPhone
-            country
-            createdDate
-            emailId
-            idDealerUser
-            joinDate
-            landLine
-            mediaUrl
-            mobile
-            name
-            # pwd
-            updatedDate
-            website
+mutation loginAsDealer($input: LoginAsDealerInput!) {
+  loginAsDealer(input: $input) {
+    accessToken
+    dealerUser {
+      address1
+      address2
+      assignment {
+        assignmentStatus
+        createdDate
+        form {
+          createdDate
+          formDescription
+          formTitle
+          idForm
+          # isActive
+          questions {
+            # answers: [Answer!]
+            # form: Form!
+            idQuestion
+            questionOrder
+            questionText
+            # refIdForm
+          }
+          updatedDate
         }
+        idAssignment
+        refIdDealerUser
+        updatedDate
+      }
+      contactPersonEmail
+      contactPersonName
+      contactPersonPhone
+      country
+      createdDate
+      emailId
+      idDealerUser
+      joinDate
+      landLine
+      mediaUrl
+      mobile
+      name
+      # pwd
+      updatedDate
+      website
+    }
+  }
 }
 
+query getDealer {
+  getDealer {
+    dealer {
+      address1
+      address2
+      assignment {
+        assignmentStatus
+        createdDate
+        form {
+          createdDate
+          formDescription
+          formTitle
+          idForm
+          isActive
+          questions {
+            form{
+                createdDate
+          formDescription
+          formTitle
+          idForm
+          isActive
+          questions {
+            answers {
+              answerText
+              createdDate
+              idAnswer
+              needsProof
+              points
+              refIdForms
+              refIdQuestion
+              updatedDate
+            }
+            idQuestion
+            questionOrder
+            questionText
+            refIdForm
+          }
+          updatedDate
+            }
+            answers {
+              answerText
+              createdDate
+              idAnswer
+              needsProof
+              points
+              refIdForms
+              refIdQuestion
+              updatedDate
+            }
+            idQuestion
+            questionOrder
+            questionText
+            refIdForm
+          }
+          updatedDate
+        }
+        idAssignment
+        refIdDealerUser
+        updatedDate
+      }
+      contactPersonEmail
+      contactPersonName
+      contactPersonPhone
+      country
+      createdDate
+      emailId
+      idDealerUser
+      joinDate
+      landLine
+      mediaUrl
+      mobile
+      name
+      # pwd
+      updatedDate
+      website
+    }
+  }
+}
+
+query getAssignment($input: Float!) {
+  getAssignment(assignmetId: $input) {
+    assignmentStatus
+    idAssignment
+    createdDate
+    updatedDate
+    refIdDealerUser
+    __typename
+    form {
+        __typename
+      formTitle
+      formDescription
+      idForm
+      isActive
+      questions {
+        __typename
+        idQuestion
+        questionOrder
+        questionText
+        submission{
+          idDealerSubmission
+          refIdAnswer
+        }
+        refIdForm
+        answers {
+            __typename
+          idAnswer
+          answerText
+          createdDate
+          updatedDate
+          points
+          needsProof
+        }
+      }
+    }
+  }
+}
+
+mutation saveAssignmentAnswers($input: AssignmentSubmissionInput!) {
+  saveAssignmentAnswers(input: $input){
+    success
+    message
+  }
+}
+
+
+query getDealerUploadUrl {
+  getDealerUploadUrl{
+    fileName
+    signedUrl
+  }
+}
