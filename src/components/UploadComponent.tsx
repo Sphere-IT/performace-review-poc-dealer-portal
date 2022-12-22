@@ -32,7 +32,7 @@ const UploadComponent = (props: any) => {
         }
     }, [props, props?.submission?.userProof]);
 
-    const [getUploadLink, { loading }] = useGetDealerUploadUrlLazyQuery({
+    const [getUploadLink, { }] = useGetDealerUploadUrlLazyQuery({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -41,7 +41,7 @@ const UploadComponent = (props: any) => {
         fetchPolicy: "no-cache"
     });
 
-    const [saveUserProof, { loading: loadingSave }] = useSaveUserProofFileMutation({
+    const [saveUserProof, { }] = useSaveUserProofFileMutation({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -50,7 +50,7 @@ const UploadComponent = (props: any) => {
         fetchPolicy: "no-cache"
     });
 
-    const [deleteUserProof, {loading: loadingDelete }] = useDeleteUserProofFileMutation({
+    const [deleteUserProof, { }] = useDeleteUserProofFileMutation({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -78,12 +78,8 @@ const UploadComponent = (props: any) => {
                     let url = res.getDealerUploadUrl.signedUrl;
                     let key = res.getDealerUploadUrl.fileName;
                     try {
-                        // console.log(file, rest);
-                        // return;
-                        
                         addFile(key);
-                        const response = await axios.put(url, file.originFileObj);
-                        // console.log(response.data)
+                        await axios.put(url, file.originFileObj);
                         addFileToSubmission(key)
                     } catch (err: any) {
                         messageApi.error(err?.message || err, 3000);
