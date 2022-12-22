@@ -4,7 +4,6 @@ import Home from "../../pages/home";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import MainLayout from "../../components/layout";
 import { MainContext, useAuthContext } from "../context";
-import { useEffect } from "react";
 import FormSubmission from "../../pages/form";
 
 

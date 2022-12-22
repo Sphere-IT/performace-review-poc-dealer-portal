@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Col, Divider, Row, Form, Input, Checkbox, Button, message, notification } from 'antd';
+import React from "react";
+import { Col, Row, Form, Input, Checkbox, Button, notification } from 'antd';
 import { useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
 import logo from "../../assets/images/Isuzu-Logo.png";
 import { useAuthContext } from "../../utils/context";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const UserLogin = (props: any) => {
 

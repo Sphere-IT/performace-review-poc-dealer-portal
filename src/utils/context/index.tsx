@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { LoginAsDealerDocument } from "../../gql/generated/query.graphql";
 import storeService from "../helpers/store";
 import { LOCAL_STORAGE_KEYS } from "../helpers/constants";
 

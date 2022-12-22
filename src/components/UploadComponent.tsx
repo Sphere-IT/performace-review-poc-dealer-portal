@@ -1,4 +1,4 @@
-import { Button, Divider, Upload, UploadFile, UploadProps, message } from "antd"
+import { Button, Divider, Upload, UploadFile, message } from "antd"
 import { UploadOutlined } from '@ant-design/icons';
 import { useEffect, useState } from "react";
 import { useDeleteUserProofFileMutation, useGetDealerUploadUrlLazyQuery, useSaveUserProofFileMutation } from "../gql/generated/query.graphql";
@@ -31,15 +31,6 @@ const UploadComponent = (props: any) => {
             // console.log(arr, fileList)
         }
     }, [props, props?.submission?.userProof]);
-
-    // const uploadP: UploadProps = {
-    //     action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    //     onChange({ file, fileList }) {
-    //       if (file.status !== 'uploading') {
-    //         console.log(file, fileList);
-    //       }
-    //     },
-    //   };
 
     const [getUploadLink, { loading }] = useGetDealerUploadUrlLazyQuery({
         context: {

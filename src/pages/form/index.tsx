@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Divider, Input, Row, Select, Typography, Upload } from "antd";
+import { Button, Card, Col, Divider, Input, Row, Select, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../../utils/context";
 import { Assignment, useDealerFinalSubmissionMutation, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
