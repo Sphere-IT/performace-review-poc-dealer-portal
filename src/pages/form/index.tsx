@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Col, Divider, Input, Row, Select, Typography } from "antd";
+import { Badge, Button, Card, Col, Descriptions, Divider, Input, Popover, Row, Select, Tag, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../../utils/context";
 import { Assignment, useDealerFinalSubmissionMutation, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
 import UploadComponent from "../../components/UploadComponent";
+import { SyncOutlined, ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
+const content = (
+    <div>
+      <Typography.Text>1. you can only approve if you answer all questions and upload required proof</Typography.Text>
+      <br/>
+      <Typography.Text>2. once you submit for review you cannot update your answers</Typography.Text>
+    </div>
+);
 
 const FormSubmission = (props: any) => {
 
@@ -102,26 +110,65 @@ const FormSubmission = (props: any) => {
         return false;
     }
 
+    const getTag = (d: any) => {
+        switch(d?.assignmentStatus) {
+            case 'PENDING_REVIEW':
+            return    <Tag icon={<SyncOutlined spin />} color="processing">
+                        Pending Review
+                </Tag>;
+            case 'CREATED':
+                return <Tag icon={<ClockCircleOutlined />} color="default">
+                Created
+              </Tag>;
+            case 'APPROVED':
+                return <Tag icon={<CheckCircleOutlined />} color="success">
+                success
+              </Tag>;
+            default:
+                return null
+        }
+    }
+
     return (
         <Row style={{ width: "100%" }}>
-            <Row style={{ width: "100%" }} justify="start" wrap>
+            <Row style={{ width: "100%", marginBottom: "25px" }} justify="start" wrap>
+            <Col span={20} >
+
+            <Descriptions  bordered>
+                <Descriptions.Item label="Title">{data?.form?.formTitle}</Descriptions.Item>
+                <Descriptions.Item label="Status">{getTag(data)}</Descriptions.Item>
+                <Descriptions.Item label="Assigned at">{data?.createdDate}</Descriptions.Item>
+                <Descriptions.Item label="Description">
+                    {data?.form?.formDescription}
+                </Descriptions.Item>
+            </Descriptions>
+            </Col>
+            <Col span={4} style={{ justifyContent: "center", alignItems: "center", display: "flex"}}>
+                    <Popover content={content} title="Submission">
+                        <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW"}>Submit</Button>
+                    </Popover>
+                </Col>
+            </Row>
+            {/* <Row style={{ width: "100%" }} justify="start" wrap>
                 <Col span={20}>
                     <Typography.Title level={3}>{data?.form?.formTitle}</Typography.Title>
-                    <Typography.Text>{data?.assignmentStatus}</Typography.Text>
+                    {getTag(data)}
                     <Typography.Paragraph>{data?.form?.formDescription}</Typography.Paragraph>
                 </Col>
                 <Col span={4} style={{ justifyContent: "center", alignItems: "center", display: "flex"}}>
-                    <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW"}>Submit</Button>
+                    <Popover content={content} title="Submission">
+                        <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW"}>Submit</Button>
+                    </Popover>
                 </Col>
-            </Row>
+            </Row> */}
             <Row style={{ width: "100%" }}>
                 {
-                    data ? data?.form?.questions?.map(q => {
+                    data ? data?.form?.questions?.map((q, qI) => {
 
                         return (
                             <Col key={`question-list-id-${q.idQuestion}`} span={24} style={{ marginBottom: 15}}>
-                                <Card>
-                                    <Typography.Title level={5} style={{ margin: "5px 0 10px 0"}}>{q.questionText} {q.idQuestion}</Typography.Title>
+                                <Card hoverable>
+                                    <Typography.Title level={5} style={{ margin: "5px 0 10px 0"}}>Q.{qI +1} - {q.questionText} {q.idQuestion}</Typography.Title>
                                     <Divider />
                                     
                                     <Select

@@ -1,9 +1,9 @@
-import { Card, Col, Result, Row, Statistic } from "antd";
+import { Card, Col, Result, Row, Statistic, Tag } from "antd";
 import { useState } from "react";
 import { Assignment, useGetDealerQuery } from "../../gql/generated/query.graphql";
 import { useAuthContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
-
+import { SyncOutlined, ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 const Home = (props: any) => {
     const [data, setData] = useState<Partial<Assignment>[]>([]);
 
@@ -28,6 +28,25 @@ const Home = (props: any) => {
             console.log(d);
         }
     });
+
+    const getTag = (d: any) => {
+        switch(d?.assignmentStatus) {
+            case 'PENDING_REVIEW':
+            return    <Tag icon={<SyncOutlined spin />} color="processing">
+                        Pending Review
+                </Tag>;
+            case 'CREATED':
+                return <Tag icon={<ClockCircleOutlined />} color="default">
+                Created
+              </Tag>;
+            case 'APPROVED':
+                return <Tag icon={<CheckCircleOutlined />} color="success">
+                success
+              </Tag>;
+            default:
+                return null
+        }
+    }
     
     return (
         <Row style={{ width: "100%" }} justify={"start"} align={"top"}>
@@ -42,7 +61,7 @@ const Home = (props: any) => {
                 />
                 </Col> :
                 loading ?
-                <Card>
+                <Card hoverable>
                     <Statistic 
                         // title={i.form?.formTitle}
                         // value={i.assignmentStatus}
@@ -56,12 +75,17 @@ const Home = (props: any) => {
                         <Card 
                             key={`key-card-item-page-listing-${i.idAssignment}`} 
                             style={{ cursor: "pointer", marginRight: 15 }} 
-                            onClick={() => navigate(`form/${i.idAssignment}`)}>
-                            <Statistic 
+                            onClick={() => navigate(`form/${i.idAssignment}`)}
+                            title={i.form?.formTitle}
+                            hoverable
+                            >
+                            
+                            {/* <Statistic 
                                 title={i.form?.formTitle}
                                 value={i.assignmentStatus}
                                 style={{ minWidth: 100 }}
-                            />
+                            /> */}
+                            {getTag(i)}
                         </Card>
                     );
                 })

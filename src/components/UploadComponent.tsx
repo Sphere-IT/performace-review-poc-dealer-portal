@@ -32,7 +32,7 @@ const UploadComponent = (props: any) => {
         }
     }, [props, props?.submission?.userProof]);
 
-    const [getUploadLink, { }] = useGetDealerUploadUrlLazyQuery({
+    const [getUploadLink] = useGetDealerUploadUrlLazyQuery({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -41,7 +41,7 @@ const UploadComponent = (props: any) => {
         fetchPolicy: "no-cache"
     });
 
-    const [saveUserProof, { }] = useSaveUserProofFileMutation({
+    const [saveUserProof] = useSaveUserProofFileMutation({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -50,7 +50,7 @@ const UploadComponent = (props: any) => {
         fetchPolicy: "no-cache"
     });
 
-    const [deleteUserProof, { }] = useDeleteUserProofFileMutation({
+    const [deleteUserProof] = useDeleteUserProofFileMutation({
         context: {
             headers: {
                 authorization: `Bearer ${authCtx.token}`
@@ -108,6 +108,7 @@ const UploadComponent = (props: any) => {
                 index = fileI;
                 return true;
             }
+            return false
         });
         console.log(f, index)
     }
