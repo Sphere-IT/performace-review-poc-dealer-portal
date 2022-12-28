@@ -5,6 +5,7 @@ import { useAuthContext } from "../../utils/context";
 import { Assignment, useDealerFinalSubmissionMutation, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
 import UploadComponent from "../../components/UploadComponent";
 import { SyncOutlined, ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import moment from "moment";
 
 const content = (
     <div>
@@ -118,11 +119,11 @@ const FormSubmission = (props: any) => {
                 </Tag>;
             case 'CREATED':
                 return <Tag icon={<ClockCircleOutlined />} color="default">
-                Created
+                In progress
               </Tag>;
-            case 'APPROVED':
+            case 'COMPLETED':
                 return <Tag icon={<CheckCircleOutlined />} color="success">
-                success
+                Completed
               </Tag>;
             default:
                 return null
@@ -137,7 +138,7 @@ const FormSubmission = (props: any) => {
             <Descriptions  bordered>
                 <Descriptions.Item label="Title">{data?.form?.formTitle}</Descriptions.Item>
                 <Descriptions.Item label="Status">{getTag(data)}</Descriptions.Item>
-                <Descriptions.Item label="Assigned at">{data?.createdDate}</Descriptions.Item>
+                <Descriptions.Item label="Assigned at">{moment(data?.createdDate).format("DD-MM-YYYY")}</Descriptions.Item>
                 <Descriptions.Item label="Description">
                     {data?.form?.formDescription}
                 </Descriptions.Item>
@@ -145,7 +146,7 @@ const FormSubmission = (props: any) => {
             </Col>
             <Col span={4} style={{ justifyContent: "center", alignItems: "center", display: "flex"}}>
                     <Popover content={content} title="Submission">
-                        <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW"}>Submit</Button>
+                        <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === "COMPLETED"}>Submit</Button>
                     </Popover>
                 </Col>
             </Row>
@@ -174,7 +175,7 @@ const FormSubmission = (props: any) => {
                                     <Select
                                     // defaultValue="lucy"
                                     // {q}
-                                    disabled={data?.assignmentStatus === "PENDING_REVIEW"}
+                                    disabled={data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === 'COMPLETED'}
                                     style={{ width: "100%" }}
                                     placeholder={"Select Answer "}
                                     onChange={(e) => onAnswerChange({answer: e, question: q.idQuestion, assignment: data.idAssignment})}
@@ -197,7 +198,7 @@ const FormSubmission = (props: any) => {
                                                 submission={q.submission} 
                                                 submissionId={q.submission?.idDealerSubmission}
                                                 onReload={getData}
-                                                disabled={data?.assignmentStatus === "PENDING_REVIEW"}
+                                                disabled={data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === 'COMPLETED'}
                                                 /> :
                                          null
                                     }

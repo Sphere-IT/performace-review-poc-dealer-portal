@@ -39,9 +39,9 @@ const Home = (props: any) => {
                 return <Tag icon={<ClockCircleOutlined />} color="default">
                 Created
               </Tag>;
-            case 'APPROVED':
+            case 'COMPLETED':
                 return <Tag icon={<CheckCircleOutlined />} color="success">
-                success
+                completed
               </Tag>;
             default:
                 return null
