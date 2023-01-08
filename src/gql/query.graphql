@@ -170,6 +170,7 @@ query getAssignment($input: Float!) {
             fileKey
             updatedDate
             createdDate
+            mediaUrl
           }
         }
         refIdForm

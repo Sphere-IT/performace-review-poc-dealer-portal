@@ -24,7 +24,7 @@ const UploadComponent = (props: any) => {
                     uid: i.fileKey,
                     name: i.fileKey,
                     status: "done",
-                    // url: "ddd",
+                    url: i?.mediaUrl,
                 })
             });
             setFileList(arr);

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Badge, Button, Card, Col, Descriptions, Divider, Input, Popover, Row, Select, Tag, Typography } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Badge, Button, Card, Col, Descriptions, Divider, Input, Popover, Row, Select, Tag, Tour, TourProps, Typography } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../../utils/context";
 import { Assignment, useDealerFinalSubmissionMutation, useGetAssignmentLazyQuery, useSaveAssignmentAnswersMutation } from "../../gql/generated/query.graphql";
@@ -18,6 +18,58 @@ const content = (
 const FormSubmission = (props: any) => {
 
     const [data, setData] = useState<Partial<Assignment> | undefined>(undefined);
+    const [tourOpen, setTourOpen] = useState(false);
+
+    const questionRef = useRef(null);
+    const buttonRef = useRef(null);
+    const selectRef = useRef(null);
+    const screenRef = useRef(null);
+    const detailsRef = useRef(null);
+
+    const tourSteps: TourProps['steps'] = [
+        // {
+        //     title: 'Form screen',
+        //     description: 'On this screen you will be able answer question relevant to the assignment you have selected',
+        //     target: () => screenRef.current,
+        //     placement: 'bottom',
+        // },
+        {
+            title: 'Form information',
+            description: 'in this section you will details about the form',
+            target: () => detailsRef.current,
+            placement: 'bottom'
+        },
+        {
+            title: 'Question',
+            description: 'This part is the question section, where you can view and answer questions',
+            target: () => questionRef.current,
+            placement: 'top'
+        },
+        {
+            title: 'Answer',
+            description: 'Click on this and you will get a pop up with a list of answers where you can select one of them as yours',
+            target: () => selectRef.current,
+            placement: 'top'
+        },
+        {
+            title: 'Submit',
+            description: 'At the end you this button will change colors, and then you will be able to click it to submit all you data to be reviewed by our team members',
+            target: () => buttonRef.current,
+            placement: 'left'
+        }
+    ]
+
+
+    const checkToOpenTour = () => {
+        const touredHome = localStorage.getItem("toured_form");
+        if (touredHome) return;
+        setTourOpen(true);
+    }
+
+    const completeTour = () => {
+        // localStorage.setItem("toured_form", 'true');
+        setTourOpen(false);
+    }
 
     const params = useParams();
     const authCtx = useAuthContext();
@@ -33,7 +85,7 @@ const FormSubmission = (props: any) => {
                 setData(undefined);
                 const dd: any = d?.getAssignment;
                 setData(dd);
-                console.log(dd);
+                checkToOpenTour()
             }
         },
         onError: (d) => {
@@ -131,14 +183,16 @@ const FormSubmission = (props: any) => {
     }
 
     return (
-        <Row style={{ width: "100%" }}>
-            <Row style={{ width: "100%", marginBottom: "25px" }} justify="start" wrap>
+        <>
+        <Tour open={tourOpen} onClose={completeTour} steps={tourSteps} />
+        <Row style={{ width: "100%" }} ref={screenRef}>
+            <Row style={{ width: "100%", marginBottom: "25px" }} justify="start" wrap ref={detailsRef}>
             <Col span={20} >
 
             <Descriptions  bordered>
                 <Descriptions.Item label="Title">{data?.form?.formTitle}</Descriptions.Item>
                 <Descriptions.Item label="Status">{getTag(data)}</Descriptions.Item>
-                <Descriptions.Item label="Assigned at">{moment(data?.createdDate).format("DD-MM-YYYY")}</Descriptions.Item>
+                <Descriptions.Item label="Assigned on">{moment(data?.createdDate).format("DD-MM-YYYY")}</Descriptions.Item>
                 <Descriptions.Item label="Description">
                     {data?.form?.formDescription}
                 </Descriptions.Item>
@@ -146,7 +200,7 @@ const FormSubmission = (props: any) => {
             </Col>
             <Col span={4} style={{ justifyContent: "center", alignItems: "center", display: "flex"}}>
                     <Popover content={content} title="Submission">
-                        <Button type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === "COMPLETED"}>Submit</Button>
+                        <Button ref={buttonRef} type="primary" onClick={() => submitForm()} disabled={cantSubmit() || loading || finalSubLoading || data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === "COMPLETED"}>Submit</Button>
                     </Popover>
                 </Col>
             </Row>
@@ -168,28 +222,29 @@ const FormSubmission = (props: any) => {
 
                         return (
                             <Col key={`question-list-id-${q.idQuestion}`} span={24} style={{ marginBottom: 15}}>
-                                <Card hoverable>
-                                    <Typography.Title level={5} style={{ margin: "5px 0 10px 0"}}>Q.{qI +1} - {q.questionText} {q.idQuestion}</Typography.Title>
+                                <Card hoverable ref={qI === 0 ? questionRef : null}>
+                                    <Typography.Title level={5} style={{ margin: "5px 0 10px 0"}}>Q.{qI +1} - {q.questionText}</Typography.Title>
                                     <Divider />
                                     
-                                    <Select
-                                    // defaultValue="lucy"
-                                    // {q}
-                                    disabled={data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === 'COMPLETED'}
-                                    style={{ width: "100%" }}
-                                    placeholder={"Select Answer "}
-                                    onChange={(e) => onAnswerChange({answer: e, question: q.idQuestion, assignment: data.idAssignment})}
-                                    value={q?.submission?.refIdAnswer ? {
-                                        value: q.submission?.refIdAnswer,
-                                        label: q.answers?.find((a2) => +a2?.idAnswer === q?.submission?.refIdAnswer)?.answerText
-                                    } : null}
-                                    options={q.answers?.map(a => {
-                                        return {
-                                            label: a.answerText,
-                                            value: a.idAnswer
-                                        }
-                                    })}
-                                    />
+                                    <div ref={qI === 0 ? selectRef : null}>
+                                        <Select
+                                        
+                                        disabled={data?.assignmentStatus === "PENDING_REVIEW" || data?.assignmentStatus === 'COMPLETED'}
+                                        style={{ width: "100%" }}
+                                        placeholder={"Select Answer "}
+                                        onChange={(e) => onAnswerChange({answer: e, question: q.idQuestion, assignment: data.idAssignment})}
+                                        value={q?.submission?.refIdAnswer ? {
+                                            value: q.submission?.refIdAnswer,
+                                            label: q.answers?.find((a2) => +a2?.idAnswer === q?.submission?.refIdAnswer)?.answerText
+                                        } : null}
+                                        options={q.answers?.map(a => {
+                                            return {
+                                                label: a.answerText,
+                                                value: a.idAnswer
+                                            }
+                                        })}
+                                        />
+                                    </div>
 
                                     {
                                         q.answers?.find((a2) => +a2?.idAnswer === q?.submission?.refIdAnswer)?.needsProof ?
@@ -212,6 +267,7 @@ const FormSubmission = (props: any) => {
                 
             </Row>
         </Row>
+        </>
     );
 }
 

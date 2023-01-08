@@ -60,9 +60,11 @@ export type Assignment = {
   __typename?: "Assignment";
   assignmentStatus: Assignment_Status;
   createdDate?: Maybe<Scalars["DateTime"]>;
+  dealer?: Maybe<DealerUser>;
   form: Form;
   idAssignment: Scalars["ID"];
   refIdDealerUser: Scalars["String"];
+  score?: Maybe<Scalars["Float"]>;
   updatedDate?: Maybe<Scalars["DateTime"]>;
 };
 
@@ -73,9 +75,15 @@ export type AssignmentSubmissionInput = {
   refIdQuestion: Scalars["Int"];
 };
 
-export type CountryToScoreRes = {
-  __typename?: "CountryToScoreRes";
-  data: Array<Scalars["JSON"]>;
+export type CountryScoreRes = {
+  __typename?: "CountryScoreRes";
+  data: Array<CountryToScoreData>;
+};
+
+export type CountryToScoreData = {
+  __typename?: "CountryToScoreData";
+  country: Scalars["String"];
+  score: Scalars["Float"];
 };
 
 export type CreateDealerInput = {
@@ -85,6 +93,8 @@ export type CreateDealerInput = {
   contactPersonName?: InputMaybe<Scalars["String"]>;
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country: Scalars["String"];
+  dealerCity?: InputMaybe<Scalars["String"]>;
+  dealerType?: InputMaybe<Dealer_Type>;
   emailId: Scalars["String"];
   joinDate: Scalars["DateTime"];
   landLine?: InputMaybe<Scalars["String"]>;
@@ -94,6 +104,21 @@ export type CreateDealerInput = {
   pwd: Scalars["String"];
   website?: InputMaybe<Scalars["String"]>;
 };
+
+export type CreateNotificationInput = {
+  isRead?: InputMaybe<Scalars["Boolean"]>;
+  notificationDescription: Scalars["String"];
+  /** id of the entity from notification screen */
+  notificationIdentifier?: InputMaybe<Scalars["String"]>;
+  notificationScreen?: InputMaybe<Notification_Type>;
+  notificationTitle: Scalars["String"];
+};
+
+export enum Dealer_Type {
+  Dealer = "DEALER",
+  Importer = "IMPORTER",
+  ServiceCenter = "SERVICE_CENTER",
+}
 
 export type DealerSubmission = {
   __typename?: "DealerSubmission";
@@ -119,6 +144,8 @@ export type DealerUser = {
   contactPersonPhone?: Maybe<Scalars["String"]>;
   country: Scalars["String"];
   createdDate?: Maybe<Scalars["DateTime"]>;
+  dealerCity?: Maybe<Scalars["String"]>;
+  dealerType?: Maybe<Scalars["String"]>;
   emailId: Scalars["String"];
   idDealerUser: Scalars["ID"];
   joinDate: Scalars["DateTime"];
@@ -126,8 +153,10 @@ export type DealerUser = {
   mediaUrl?: Maybe<Scalars["String"]>;
   mobile?: Maybe<Scalars["String"]>;
   name: Scalars["String"];
+  pictureUrl?: Maybe<Scalars["String"]>;
   pwd: Scalars["String"];
   updatedDate?: Maybe<Scalars["DateTime"]>;
+  userUploads: Scalars["String"];
   website?: Maybe<Scalars["String"]>;
 };
 
@@ -138,6 +167,8 @@ export type EditDealerInput = {
   contactPersonName?: InputMaybe<Scalars["String"]>;
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country?: InputMaybe<Scalars["String"]>;
+  dealerCity?: InputMaybe<Scalars["String"]>;
+  dealerType?: InputMaybe<Dealer_Type>;
   emailId?: InputMaybe<Scalars["String"]>;
   idDealerUser: Scalars["String"];
   joinDate?: InputMaybe<Scalars["DateTime"]>;
@@ -182,6 +213,36 @@ export type Form = {
   updatedDate?: Maybe<Scalars["DateTime"]>;
 };
 
+export type FormQuestionStats = {
+  __typename?: "FormQuestionStats";
+  qo?: Maybe<Scalars["Float"]>;
+  question_text?: Maybe<Scalars["String"]>;
+  submissions?: Maybe<Scalars["JSON"]>;
+  total_answers?: Maybe<Scalars["Float"]>;
+  total_submissions?: Maybe<Scalars["Float"]>;
+};
+
+export type FormQuestionStatsV2 = {
+  __typename?: "FormQuestionStatsV2";
+  answers?: Maybe<Scalars["JSON"]>;
+  id_question?: Maybe<Scalars["Float"]>;
+  question_text?: Maybe<Scalars["String"]>;
+};
+
+export type FormReport = {
+  __typename?: "FormReport";
+  answers?: Maybe<Scalars["JSON"]>;
+  idquestion: Scalars["Float"];
+  questionorder: Scalars["Float"];
+  questiontext: Scalars["String"];
+};
+
+export type GetAllNotificationsResponse = {
+  __typename?: "GetAllNotificationsResponse";
+  notifications?: Maybe<Array<NotificationsEntity>>;
+  unreadCount?: Maybe<Scalars["Float"]>;
+};
+
 export type GetDealerResponse = {
   __typename?: "GetDealerResponse";
   dealer: DealerUser;
@@ -215,11 +276,14 @@ export type LoginAsDealerResponse = {
 export type Mutation = {
   __typename?: "Mutation";
   createDealerByAdmin: SuccessResponse;
+  createNotification: SuccessResponse;
   deleteUserProofFile: SuccessResponse;
   evaluateAssignment: Scalars["Boolean"];
   finalSubmission: DealerSubmission;
   loginAsAdmin: LoginAsAdminResponse;
   loginAsDealer: LoginAsDealerResponse;
+  markAllNotificationAsRead: SuccessResponse;
+  markNotificationAsRead: SuccessResponse;
   saveAssignmentAnswers: SuccessResponse;
   saveUserProofFile: UserProof;
   updateDealerByAdmin: DealerUser;
@@ -227,6 +291,10 @@ export type Mutation = {
 
 export type MutationCreateDealerByAdminArgs = {
   input: CreateDealerInput;
+};
+
+export type MutationCreateNotificationArgs = {
+  input: CreateNotificationInput;
 };
 
 export type MutationDeleteUserProofFileArgs = {
@@ -249,6 +317,10 @@ export type MutationLoginAsDealerArgs = {
   input: LoginAsDealerInput;
 };
 
+export type MutationMarkNotificationAsReadArgs = {
+  notificationId: Scalars["Float"];
+};
+
 export type MutationSaveAssignmentAnswersArgs = {
   input: AssignmentSubmissionInput;
 };
@@ -262,14 +334,36 @@ export type MutationUpdateDealerByAdminArgs = {
   input: EditDealerInput;
 };
 
+export enum Notification_Type {
+  Assignment = "ASSIGNMENT",
+  Dealer = "DEALER",
+}
+
+export type NotificationsEntity = {
+  __typename?: "NotificationsEntity";
+  createdDate?: Maybe<Scalars["DateTime"]>;
+  isRead: Scalars["Boolean"];
+  notificationDescription: Scalars["String"];
+  /** id of the entity from notification screen */
+  notificationIdentifier?: Maybe<Scalars["String"]>;
+  notificationScreen?: Maybe<Notification_Type>;
+  notificationTitle: Scalars["String"];
+  updatedDate?: Maybe<Scalars["DateTime"]>;
+};
+
 export type Query = {
   __typename?: "Query";
   exportDealerScores: ExportDealersScoresResponse;
   getAllDealers: ListDealerResponse;
+  getAllNotifications: GetAllNotificationsResponse;
+  getAllSubmissions: Array<Assignment>;
   getAssignment: Assignment;
-  getCountryToScore: CountryToScoreRes;
+  getCountryToScore: CountryScoreRes;
   getDealer: GetDealerResponse;
   getDealerUploadUrl: S3SignedUrlResponse;
+  getFormAnalysis: FormReport;
+  getQuestionStats?: Maybe<Array<FormQuestionStats>>;
+  getQuestionStatsV2?: Maybe<Array<FormQuestionStatsV2>>;
   getSubmissionStatusCount: SubmissionStatusRes;
   getUserProofFile: UserProof;
   questionAnswerCount: QuestionAnswerCountRes;
@@ -315,9 +409,9 @@ export type S3SignedUrlResponse = {
 
 export type SubmissionStatusRes = {
   __typename?: "SubmissionStatusRes";
-  accepted: Scalars["Int"];
+  completed: Scalars["Int"];
+  inProgress: Scalars["Int"];
   pending: Scalars["Int"];
-  rejected: Scalars["Int"];
 };
 
 export type SuccessResponse = {
@@ -332,6 +426,7 @@ export type UserProof = {
   dealerSubmissions: DealerSubmission;
   fileKey: Scalars["String"];
   idUserProof: Scalars["ID"];
+  mediaUrl?: Maybe<Scalars["String"]>;
   refIdSubmission: Scalars["Int"];
   updatedDate?: Maybe<Scalars["DateTime"]>;
 };
@@ -553,6 +648,7 @@ export type GetAssignmentQuery = {
             fileKey: string;
             updatedDate?: any | null;
             createdDate?: any | null;
+            mediaUrl?: string | null;
           }> | null;
         } | null;
         answers?: Array<{
@@ -930,6 +1026,7 @@ export const GetAssignmentDocument = gql`
               fileKey
               updatedDate
               createdDate
+              mediaUrl
             }
           }
           refIdForm
