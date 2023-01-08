@@ -67,7 +67,7 @@ const FormSubmission = (props: any) => {
     }
 
     const completeTour = () => {
-        // localStorage.setItem("toured_form", 'true');
+        localStorage.setItem("toured_form", 'true');
         setTourOpen(false);
     }
 
