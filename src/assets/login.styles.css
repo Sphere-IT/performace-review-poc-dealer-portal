@@ -1,5 +1,7 @@
 .login-container{
     background-image: url("./images/login-baner.jpeg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .login-container .form-container {

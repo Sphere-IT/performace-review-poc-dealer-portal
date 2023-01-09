@@ -15,6 +15,9 @@ const storeService = {
     },
     clear: () => {
         localStorage.clear();
+    },
+    remove: (key: string) => {
+        localStorage.removeItem(key);
     }
 }
 

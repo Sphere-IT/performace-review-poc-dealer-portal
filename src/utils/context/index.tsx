@@ -35,7 +35,9 @@ export const MainContext = (props: any) => {
         setUser(null);
         setToken(null);
         setLoggedIn(false);
-        storeService.clear();
+        storeService.remove(LOCAL_STORAGE_KEYS.USER)
+        storeService.remove(LOCAL_STORAGE_KEYS.TOKEN)
+        storeService.remove(LOCAL_STORAGE_KEYS.IS_LOGGED_IN)
     }
 
     const checkLogin = () => {

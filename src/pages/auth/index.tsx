@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Col, Row, Form, Input, Checkbox, Button, notification, Modal, Typography } from 'antd';
-import { useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
+import { Notification_Type, useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
 import logo from "../../assets/images/Isuzu-Logo.png";
 import { useAuthContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ const UserLogin = (props: any) => {
         messageApi.error({
           type: "error",
           message: "Error",
-          duration: 3000,
+          duration: 1500,
           placement: "bottom",
           description: d?.message
         })
@@ -66,7 +66,39 @@ const UserLogin = (props: any) => {
       const [createNotification, { loading: passLoading }] = useCreateNotificationMutation();
 
       const handleOk = () => {
-        createNotification({})
+        createNotification({
+          variables: {
+            input: {
+              isRead: false,
+              notificationTitle: "Change password request",
+              notificationDescription: `Dealer with email id: ${emailId} requested to change password`,
+              notificationIdentifier: emailId,
+              notificationScreen: Notification_Type.Dealer
+            }
+          },
+          onCompleted: () => {
+            setIsModalOpen(false);
+            setEmailId("");
+            messageApi.success({
+              type: "success",
+              message: "Success",
+              duration: 1500,
+              placement: "bottom",
+              description: "One of our team members will contact you shortly"
+            })
+          },
+          onError: (e) => {
+            setIsModalOpen(false);
+            setEmailId("");
+            messageApi.error({
+              type: "error",
+              message: "Error",
+              duration: 1500,
+              placement: "bottom",
+              description: "An error occurred"
+            })
+          }
+        })
       }
       const handleCancel = () => {
         setIsModalOpen(false);
