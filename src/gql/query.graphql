@@ -223,3 +223,11 @@ mutation dealerFinalSubmission($input: Float!){
     idDealerSubmission
   }
 }
+
+
+mutation createNotification($input: CreateNotificationInput!){
+  createNotification(input: $input){
+    success
+    message
+  }
+}

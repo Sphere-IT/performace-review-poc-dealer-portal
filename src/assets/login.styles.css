@@ -1,0 +1,9 @@
+.login-container{
+    background-image: url("./images/login-baner.jpeg");
+}
+
+.login-container .form-container {
+    background-color: white;
+    border-radius: 15px;
+    box-sizing: border-box;
+}

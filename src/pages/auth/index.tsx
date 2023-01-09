@@ -1,13 +1,18 @@
-import React from "react";
-import { Col, Row, Form, Input, Checkbox, Button, notification } from 'antd';
-import { useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
+import React, { useState } from "react";
+import { Col, Row, Form, Input, Checkbox, Button, notification, Modal, Typography } from 'antd';
+import { useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
 import logo from "../../assets/images/Isuzu-Logo.png";
 import { useAuthContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
+import "../../assets/login.styles.css";
 
 const UserLogin = (props: any) => {
 
     const [messageApi, contextHolder] = notification.useNotification();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [notError, setNotError] = useState("");
+    const [emailId, setEmailId] = useState("");
+    // const 
 
     const authContext = useAuthContext();
     const navigate = useNavigate();
@@ -58,9 +63,18 @@ const UserLogin = (props: any) => {
         console.log('Failed:', errorInfo);
       };
 
+      const [createNotification, { loading: passLoading }] = useCreateNotificationMutation();
+
+      const handleOk = () => {
+        createNotification({})
+      }
+      const handleCancel = () => {
+        setIsModalOpen(false);
+      }
+
     return (
-    <Row justify="center" align='middle' style={{ height: "100%"}}>
-      <Col span={6}>
+    <Row justify="start" align='middle' style={{ height: "100%"}} className="login-container">
+      <Col span={8} offset={3} className="form-container">
       <Form
       name="basic"
       labelCol={{ span: 8 }}
@@ -69,17 +83,21 @@ const UserLogin = (props: any) => {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
       autoComplete="off"
+      
     >
       <img src={logo} style={{ width: "100%", marginBottom: 15}}/>
+
       <Form.Item
         label="Username"
         name="username"
+        style={{ width: "80%"}}
         rules={[{ required: true, message: 'Please input your username!' }]}
       >
         <Input />
       </Form.Item>
 
       <Form.Item
+        style={{ width: "80%"}}
         label="Password"
         name="password"
         rules={[{ required: true, message: 'Please input your password!' }]}
@@ -87,11 +105,11 @@ const UserLogin = (props: any) => {
         <Input.Password />
       </Form.Item>
 
-      <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 8, span: 16 }}>
-        <Checkbox>Remember me</Checkbox>
+      <Form.Item name="remember" valuePropName="checked" wrapperCol={{ span: 12 }} style={{ display: "flex", justifyContent: 'center'}}>
+        <Button onClick={() => setIsModalOpen(true)}>Forgot your password?</Button>
       </Form.Item>
 
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+      <Form.Item wrapperCol={{ span: 12 }} style={{ display: "flex", justifyContent: 'center'}}>
         <Button type="primary" htmlType="submit" disabled={loading} loading={loading}>
           Submit
         </Button>
@@ -99,6 +117,26 @@ const UserLogin = (props: any) => {
     </Form>
     {contextHolder}
       </Col>
+
+      <Col span={12}></Col>
+
+      <Modal title="Forgot password" open={isModalOpen} okText="Confirm" okButtonProps={{
+        disabled: !emailId?.length ? true : false,
+        loading: passLoading
+      }} onOk={handleOk} onCancel={handleCancel}>
+        <Typography.Paragraph>Please insert your email below</Typography.Paragraph>
+        <Input placeholder="Email id" 
+        status={!emailId?.length ? "error" : undefined}
+        value={emailId} 
+        onChange={(e) => {
+          if (!emailId?.length){
+            setNotError("Cannot be empty")
+          }else{
+            setNotError("")
+          }
+          setEmailId(e.target.value)
+        }}  />
+      </Modal>
     </Row>
     )
 }

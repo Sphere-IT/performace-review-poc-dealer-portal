@@ -728,6 +728,19 @@ export type DealerFinalSubmissionMutation = {
   };
 };
 
+export type CreateNotificationMutationVariables = Exact<{
+  input: CreateNotificationInput;
+}>;
+
+export type CreateNotificationMutation = {
+  __typename?: "Mutation";
+  createNotification: {
+    __typename?: "SuccessResponse";
+    success: boolean;
+    message?: string | null;
+  };
+};
+
 export const LoginAsAdminDocument = gql`
   mutation loginAsAdmin($input: loginAsAdminInput!) {
     loginAsAdmin(input: $input) {
@@ -1356,4 +1369,55 @@ export type DealerFinalSubmissionMutationResult =
 export type DealerFinalSubmissionMutationOptions = Apollo.BaseMutationOptions<
   DealerFinalSubmissionMutation,
   DealerFinalSubmissionMutationVariables
+>;
+export const CreateNotificationDocument = gql`
+  mutation createNotification($input: CreateNotificationInput!) {
+    createNotification(input: $input) {
+      success
+      message
+    }
+  }
+`;
+export type CreateNotificationMutationFn = Apollo.MutationFunction<
+  CreateNotificationMutation,
+  CreateNotificationMutationVariables
+>;
+
+/**
+ * __useCreateNotificationMutation__
+ *
+ * To run a mutation, you first call `useCreateNotificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateNotificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createNotificationMutation, { data, loading, error }] = useCreateNotificationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateNotificationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateNotificationMutation,
+    CreateNotificationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateNotificationMutation,
+    CreateNotificationMutationVariables
+  >(CreateNotificationDocument, options);
+}
+export type CreateNotificationMutationHookResult = ReturnType<
+  typeof useCreateNotificationMutation
+>;
+export type CreateNotificationMutationResult =
+  Apollo.MutationResult<CreateNotificationMutation>;
+export type CreateNotificationMutationOptions = Apollo.BaseMutationOptions<
+  CreateNotificationMutation,
+  CreateNotificationMutationVariables
 >;
