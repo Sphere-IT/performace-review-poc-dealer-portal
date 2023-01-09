@@ -20,14 +20,14 @@ const MainLayout = (props: any) => {
 
   return (
     <Layout style={{ height: "100%"}}>
-      <Header style={{ position: 'sticky', top: 0, zIndex: 1, width: '100%', display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <Header style={{ position: 'sticky', background: '#EBECEC', top: 0, zIndex: 1, width: '100%', display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
         <div
           style={{
             float: 'left',
             width: 120,
             height: 40,
             margin: '12px 24px 16px 0',
-            // background: 'rgba(255, 255, 255, 0.2)',
+            background: '#EBECEC',
           }}
         >
             <img src={logo} style={{ width: "100%", height: "100%", objectFit: "scale-down"}}/>
