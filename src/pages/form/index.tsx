@@ -35,25 +35,25 @@ const FormSubmission = (props: any) => {
         // },
         {
             title: 'Form information',
-            description: 'in this section you will details about the form',
+            description: 'This section highlights details about the form',
             target: () => detailsRef.current,
             placement: 'bottom'
         },
         {
-            title: 'Question',
-            description: 'This part is the question section, where you can view and answer questions',
+            title: 'Questionnaire',
+            description: 'This section allows you to view and answer questions',
             target: () => questionRef.current,
             placement: 'top'
         },
         {
             title: 'Answer',
-            description: 'Click on this and you will get a pop up with a list of answers where you can select one of them as yours',
+            description: 'Click on the box to get a list of choices whereby you can select the appropriate answer.',
             target: () => selectRef.current,
             placement: 'top'
         },
         {
             title: 'Submit',
-            description: 'At the end you this button will change colors, and then you will be able to click it to submit all you data to be reviewed by our team members',
+            description: 'Once all the questions have been answered, then you only will you be able to submit your responses, which will then be reviewed by our team.',
             target: () => buttonRef.current,
             placement: 'left'
         }

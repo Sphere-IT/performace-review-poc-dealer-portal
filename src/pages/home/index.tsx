@@ -21,7 +21,7 @@ const Home = (props: any) => {
           },
         {
             title: 'Assignment',
-            description: 'Click on this card and you can start your assignment',
+            description: 'Click on this card to start your assignment',
             target: () => cardRef.current,
             placement: "right"
         },
