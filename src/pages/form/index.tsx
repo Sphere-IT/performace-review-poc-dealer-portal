@@ -53,7 +53,7 @@ const FormSubmission = (props: any) => {
         },
         {
             title: 'Submit',
-            description: 'Once all the questions have been answered, then you only will you be able to submit your responses, which will then be reviewed by our team.',
+            description: 'Once all the questions have been answered, then only will you be able to submit your responses, which will then be reviewed by our team.',
             target: () => buttonRef.current,
             placement: 'left'
         }
