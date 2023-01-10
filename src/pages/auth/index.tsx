@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Col, Row, Form, Input, Checkbox, Button, notification, Modal, Typography } from 'antd';
-import { Notification_Type, useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
+import { Notification_Type, useCreateForgotPasswordNotificationMutation, useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
 import logo from "../../assets/images/Isuzu-Logo.png";
 import { useAuthContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
@@ -63,7 +63,7 @@ const UserLogin = (props: any) => {
         console.log('Failed:', errorInfo);
       };
 
-      const [createNotification, { loading: passLoading }] = useCreateNotificationMutation();
+      const [createNotification, { loading: passLoading }] = useCreateForgotPasswordNotificationMutation();
 
       const handleOk = () => {
         createNotification({
@@ -95,7 +95,7 @@ const UserLogin = (props: any) => {
               message: "Error",
               duration: 1500,
               placement: "bottom",
-              description: "An error occurred"
+              description: e?.message || "An error occurred"
             })
           }
         })

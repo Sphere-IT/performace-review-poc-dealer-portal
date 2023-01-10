@@ -94,7 +94,7 @@ export type CreateDealerInput = {
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country: Scalars["String"];
   dealerCity?: InputMaybe<Scalars["String"]>;
-  dealerType?: InputMaybe<Dealer_Type>;
+  dealerType?: InputMaybe<Scalars["String"]>;
   emailId: Scalars["String"];
   joinDate: Scalars["DateTime"];
   landLine?: InputMaybe<Scalars["String"]>;
@@ -113,12 +113,6 @@ export type CreateNotificationInput = {
   notificationScreen?: InputMaybe<Notification_Type>;
   notificationTitle: Scalars["String"];
 };
-
-export enum Dealer_Type {
-  Dealer = "DEALER",
-  Importer = "IMPORTER",
-  ServiceCenter = "SERVICE_CENTER",
-}
 
 export type DealerSubmission = {
   __typename?: "DealerSubmission";
@@ -168,7 +162,7 @@ export type EditDealerInput = {
   contactPersonPhone?: InputMaybe<Scalars["String"]>;
   country?: InputMaybe<Scalars["String"]>;
   dealerCity?: InputMaybe<Scalars["String"]>;
-  dealerType?: InputMaybe<Dealer_Type>;
+  dealerType?: InputMaybe<Scalars["String"]>;
   emailId?: InputMaybe<Scalars["String"]>;
   idDealerUser: Scalars["String"];
   joinDate?: InputMaybe<Scalars["DateTime"]>;
@@ -276,6 +270,7 @@ export type LoginAsDealerResponse = {
 export type Mutation = {
   __typename?: "Mutation";
   createDealerByAdmin: SuccessResponse;
+  createForgotPasswordNotification: SuccessResponse;
   createNotification: SuccessResponse;
   deleteUserProofFile: SuccessResponse;
   evaluateAssignment: Scalars["Boolean"];
@@ -287,10 +282,15 @@ export type Mutation = {
   saveAssignmentAnswers: SuccessResponse;
   saveUserProofFile: UserProof;
   updateDealerByAdmin: DealerUser;
+  updateDealerPassword: SuccessResponse;
 };
 
 export type MutationCreateDealerByAdminArgs = {
   input: CreateDealerInput;
+};
+
+export type MutationCreateForgotPasswordNotificationArgs = {
+  input: CreateNotificationInput;
 };
 
 export type MutationCreateNotificationArgs = {
@@ -334,6 +334,10 @@ export type MutationUpdateDealerByAdminArgs = {
   input: EditDealerInput;
 };
 
+export type MutationUpdateDealerPasswordArgs = {
+  input: UpdateDealerPasswordInput;
+};
+
 export enum Notification_Type {
   Assignment = "ASSIGNMENT",
   Dealer = "DEALER",
@@ -342,6 +346,7 @@ export enum Notification_Type {
 export type NotificationsEntity = {
   __typename?: "NotificationsEntity";
   createdDate?: Maybe<Scalars["DateTime"]>;
+  idNotification?: Maybe<Scalars["Float"]>;
   isRead: Scalars["Boolean"];
   notificationDescription: Scalars["String"];
   /** id of the entity from notification screen */
@@ -418,6 +423,11 @@ export type SuccessResponse = {
   __typename?: "SuccessResponse";
   message?: Maybe<Scalars["String"]>;
   success: Scalars["Boolean"];
+};
+
+export type UpdateDealerPasswordInput = {
+  dealerId: Scalars["String"];
+  newPassword: Scalars["String"];
 };
 
 export type UserProof = {
@@ -735,6 +745,19 @@ export type CreateNotificationMutationVariables = Exact<{
 export type CreateNotificationMutation = {
   __typename?: "Mutation";
   createNotification: {
+    __typename?: "SuccessResponse";
+    success: boolean;
+    message?: string | null;
+  };
+};
+
+export type CreateForgotPasswordNotificationMutationVariables = Exact<{
+  input: CreateNotificationInput;
+}>;
+
+export type CreateForgotPasswordNotificationMutation = {
+  __typename?: "Mutation";
+  createForgotPasswordNotification: {
     __typename?: "SuccessResponse";
     success: boolean;
     message?: string | null;
@@ -1421,3 +1444,56 @@ export type CreateNotificationMutationOptions = Apollo.BaseMutationOptions<
   CreateNotificationMutation,
   CreateNotificationMutationVariables
 >;
+export const CreateForgotPasswordNotificationDocument = gql`
+  mutation createForgotPasswordNotification($input: CreateNotificationInput!) {
+    createForgotPasswordNotification(input: $input) {
+      success
+      message
+    }
+  }
+`;
+export type CreateForgotPasswordNotificationMutationFn =
+  Apollo.MutationFunction<
+    CreateForgotPasswordNotificationMutation,
+    CreateForgotPasswordNotificationMutationVariables
+  >;
+
+/**
+ * __useCreateForgotPasswordNotificationMutation__
+ *
+ * To run a mutation, you first call `useCreateForgotPasswordNotificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateForgotPasswordNotificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createForgotPasswordNotificationMutation, { data, loading, error }] = useCreateForgotPasswordNotificationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateForgotPasswordNotificationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateForgotPasswordNotificationMutation,
+    CreateForgotPasswordNotificationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    CreateForgotPasswordNotificationMutation,
+    CreateForgotPasswordNotificationMutationVariables
+  >(CreateForgotPasswordNotificationDocument, options);
+}
+export type CreateForgotPasswordNotificationMutationHookResult = ReturnType<
+  typeof useCreateForgotPasswordNotificationMutation
+>;
+export type CreateForgotPasswordNotificationMutationResult =
+  Apollo.MutationResult<CreateForgotPasswordNotificationMutation>;
+export type CreateForgotPasswordNotificationMutationOptions =
+  Apollo.BaseMutationOptions<
+    CreateForgotPasswordNotificationMutation,
+    CreateForgotPasswordNotificationMutationVariables
+  >;

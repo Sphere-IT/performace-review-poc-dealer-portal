@@ -231,3 +231,10 @@ mutation createNotification($input: CreateNotificationInput!){
     message
   }
 }
+
+mutation createForgotPasswordNotification($input: CreateNotificationInput!){
+  createForgotPasswordNotification(input: $input){
+    success
+    message
+  }
+}
