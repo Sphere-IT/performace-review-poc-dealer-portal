@@ -77,9 +77,14 @@ const UploadComponent = (props: any) => {
                 if (res?.getDealerUploadUrl?.signedUrl) {
                     let url = res.getDealerUploadUrl.signedUrl;
                     let key = res.getDealerUploadUrl.fileName;
+                    console.log(file.type)
                     try {
                         addFile(key);
-                        await axios.put(url, file.originFileObj);
+                        await axios.put(url, file.originFileObj, {
+                            headers: {
+                                'Content-Type': file.type
+                            }
+                        });
                         addFileToSubmission(key)
                     } catch (err: any) {
                         messageApi.error(err?.message || err, 3000);

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Col, Row, Form, Input, Checkbox, Button, notification, Modal, Typography } from 'antd';
-import { Notification_Type, useCreateForgotPasswordNotificationMutation, useCreateNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
+import { Col, Row, Form, Input, Button, notification, Modal, Typography } from 'antd';
+import { Notification_Type, useCreateForgotPasswordNotificationMutation, useLoginAsDealerMutation } from "../../gql/generated/query.graphql";
 import logo from "../../assets/images/Isuzu-Logo.png";
 import { useAuthContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
